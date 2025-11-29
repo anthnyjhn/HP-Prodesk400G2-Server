@@ -1,0 +1,55 @@
+name: affectionate_davide
+services:
+  pihole:
+    cpu_shares: 90
+    command: []
+    container_name: pihole
+    deploy:
+      resources:
+        limits:
+          memory: 3836M
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    environment:
+      - TZ=UTC
+      - WEBPASSWORD=password
+    hostname: pihole
+    image: pihole/pihole:2025.11.0
+    labels:
+      icon: https://github.com/walkxcode/dashboard-icons/blob/main/png/pi-hole.png?raw=true
+    ports:
+      - target: 53
+        published: "53"
+        protocol: tcp
+      - target: 53
+        published: "53"
+        protocol: udp
+      - target: 80
+        published: "7300"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/pihole/data/pihole
+        target: /etc/pihole
+      - type: bind
+        source: /DATA/AppData/pihole/data/dnsmasq
+        target: /etc/dnsmasq.d
+    devices: []
+    cap_add: []
+    network_mode: bridge
+    privileged: false
+x-casaos:
+  author: self
+  category: self
+  hostname: ""
+  icon: https://github.com/walkxcode/dashboard-icons/blob/main/png/pi-hole.png?raw=true
+  index: /admin
+  is_uncontrolled: false
+  port_map: "7300"
+  scheme: http
+  store_app_id: affectionate_davide
+  title:
+    custom: ""
+    en_us: pihole
