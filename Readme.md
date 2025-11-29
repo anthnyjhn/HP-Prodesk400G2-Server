@@ -107,6 +107,9 @@ https://youtu.be/uOvB0CIhb5k?si=nWvAG3qImAG5oeWJ
 Ollama + Docker + OpenWeb UI (Bellulama)
 https://github.com/ai-joe-git/Belullama
 
+ConvertX:
+container port: 80 - 3000 only.
+
 # Power Efficiency
 
 ### **Enable Powertop Autotune**
