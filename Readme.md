@@ -1,53 +1,60 @@
-# BUYING
+# MY HARDWARE SPECS
 
 - Intel i5-4590 3.70GHZ
 - 12GB RAM
 - 128GB SSD - Boot Drive
 - 1TB HDD - Storage Drive
 
-# SETUP
+# DOWNLOAD OS
 
-- Add SSD
-- Setup BIOS
-  - Boot Order
-  - UEFI / Legacy
+Download Ubuntu Server LTS from https://ubuntu.com/download/server.
+Flash your OS to a flash drive. I used **Balena Etcher** but you can use almost any OS flashing softwares.
+
+# SETUP BIOS
+
+Boot Order - set the flash drive as the first boot option.
 
 # INSTALL OS
 
-- Download OS: Ubuntu Server 24.04 Server LTS
-- USB Etcher: Balena Etcher
+Install Ubuntu Server to your server and follow the prompt. It should be self-explanatory.
 
 # SETUP OS
 
 ## Update packages:
 
-    ```bash
+To update your repo and get the latest updates
 
-sudo apt update && sudo apt upgrade`
-
-````
+```bash
+sudo apt update && sudo apt upgrade
+```
 
 ## Get IP & MAC address:
 
- ```bash
- ip link
-````
+Write your MAC address. It's going to be useful in the future.
+
+```bash
+ip link
+```
 
 ## Check SSH and Enable:
 
-    ```bash
+Enable ssh for remote access.
+
+```bash
     systemctl status ssh
     systemctl enable ssh
-    ```
+```
 
 ## Reserve an IP address on Router to your device's MAC address
+
+Go to your router's control panel. Reserve a static ip to your Server's MAC address.
 
 ## Disable Graphical Terminal (boot without display)
 
 ```bash
 nano /etc/default/grub
 
-GRUB_CMDLINE_LINUX="text" # Change this line
+GRUB_CMDLINE_LINUX="text" # Find and add 'text' to this line
 GRUB_TERMINAL=console # uncomment this line
 
 ```
@@ -67,17 +74,18 @@ sudo nano /etc/systemd/system/getty@tty1.service.d/override.conf
 
 Paste:
 
-````bash
+```bash
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin <your-username> --noclear %I $TERM```
+ExecStart=-/sbin/agetty --autologin YOUR_USERNAME --noclear %I $TERM
+```
 
 ### Reload systemd and enable auto-login
 
 ```bash
     sudo systemctl daemon-reexec
     sudo systemctl restart getty@tty1
-````
+```
 
 ## Setup CasaOS
 
@@ -108,6 +116,9 @@ sudo apt update
 sudo apt install -y docker.io docker-compose
 ```
 
+## Setup Shared Folder
+
+**Using CasaOS**
 Create Storage (1TB)
 Storage Manager > Create Storage
 
@@ -117,18 +128,28 @@ Create a Folder and Tick "Shared"
 Get link:
 Files > Shared > Right click on Folder and Get Network Path
 
+or
+
+**Create Manually**
+
+```bash
+sudo mkdir -p /srv/samba/FOLDERNAME
+```
+
 Edit Samba config
 
 ```bash
 sudo nano /etc/samba/smb.conf
-
 ```
 
 ```bash
+[nas] # 'nas' will appear in the smb url. E.g., smb://192.168.1.199/nas
+path = /srv/samba/FOLDERNAME
 vfs objects = catia fruit streams_xattr # uncomment this line
 
 # paste these lines
 read only = no
+browsable = yes
 guest ok = no
 ```
 
@@ -141,9 +162,18 @@ sudo systemctl restart smbd nmbd
 Add samba users:
 
 ```bash
-sudo adduser <$username> # create server user
-sudo smbpasswd -a <$username> # add user account to samba and set password
-sudo smbpasswd -e <$username> # enable user account
+sudo adduser YOUR_USERNAME # create server user
+sudo smbpasswd -a YOUR_USERNAME # add user account to samba and set password
+sudo smbpasswd -e YOUR_USERNAME # enable user account
+
+sudo chown YOUR_USERNAME:YOUR_USERNAME /srv/samba/FOLDERNAME # Set user permission
+sudo chmod 770 /srv/samba/FOLDERNAME
+```
+
+Access smb:
+
+```bash
+smb://IPADDRESS/FOLDERNAME
 ```
 
 Pi-hole on CasaOS Setup:
